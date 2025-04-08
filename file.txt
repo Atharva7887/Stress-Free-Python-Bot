@@ -1,7 +1,0 @@
-[INFO] Server started successfully.
-[WARNING] Disk space running low.
-[ERROR] Unable to connect to database.
-[DEBUG] Checking system configurations.
-[INFO] Python script executed successfully.
-[ERROR] Python module not found.
-[DEBUG] User logged in from IP 192.168.1.1.
