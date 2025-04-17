@@ -18,7 +18,7 @@ def save_tasks(tasks):
 # Show tasks
 def show_tasks(tasks):
     if not tasks:
-        print("✅ No tasks! You’re all caught up.")
+        print("No tasks! You’re all caught up.")
         return
     for i, task in enumerate(tasks):
         print(f"{i + 1}. {task}")
@@ -28,7 +28,7 @@ def add_task(tasks):
     title = input("Enter task title: ")
     tasks.append("[ ] " + title)
     save_tasks(tasks)
-    print("✅ Task added.")
+    print("Task added.")
 
 # Mark task as done
 def mark_done(tasks):
@@ -38,11 +38,11 @@ def mark_done(tasks):
         if not tasks[index].startswith("[X]"):
             tasks[index] = "[X]" + tasks[index][3:]
             save_tasks(tasks)
-            print("✅ Task marked as done.")
+            print("Task marked as done.")
         else:
-            print("⚠️ Task is already marked as done.")
+            print("Task is already marked as done.")
     else:
-        print("⚠️ Invalid task number.")
+        print("Invalid task number.")
 
 # Delete a task
 def delete_task(tasks):
@@ -51,15 +51,15 @@ def delete_task(tasks):
     if 0 <= index < len(tasks):
         tasks.pop(index)
         save_tasks(tasks)
-        print("🗑️ Task deleted.")
+        print("Task deleted.")
     else:
-        print("⚠️ Invalid task number.")
+        print("Invalid task number.")
 
 # Main loop
 def main():
     tasks = load_tasks()
     while True:
-        print("\n📋 To-Do List Menu:")
+        print("\nTo-Do List Menu:")
         print("1. Show tasks")
         print("2. Add task")
         print("3. Mark task as done")
@@ -77,10 +77,10 @@ def main():
         elif choice == "4":
             delete_task(tasks)
         elif choice == "5":
-            print("👋 Goodbye!")
+            print("Goodbye!")
             break
         else:
-            print("⚠️ Invalid choice, please try again.")
+            print("Invalid choice, please try again.")
 
 if __name__ == "__main__":
     main()
