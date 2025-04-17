@@ -1,132 +1,72 @@
-import json
-import os
-from datetime import datetime
-from colorama import init, Fore, Style
+TASKS_FILE = "tasks.txt"
 
-init(autoreset=True)
-
-TASKS_FILE = "tasks.json"
-
-# Load existing tasks
+# Load tasks
 def load_tasks():
-    if os.path.exists(TASKS_FILE):
+    try:
         with open(TASKS_FILE, "r") as f:
-            tasks = json.load(f)
-            # Ensure old tasks get new fields if missing
-            for task in tasks:
-                if "priority" not in task:
-                    task["priority"] = "Low"
-                if "due_date" not in task:
-                    task["due_date"] = "N/A"
-            return tasks
-    return []
+            lines = f.readlines()
+            return [line.strip() for line in lines]
+    except FileNotFoundError:
+        return []
 
 # Save tasks
 def save_tasks(tasks):
     with open(TASKS_FILE, "w") as f:
-        json.dump(tasks, f, indent=4)
+        for task in tasks:
+            f.write(task + "\n")
 
-# Show tasks with color and details
+# Show tasks
 def show_tasks(tasks):
     if not tasks:
-        print(Fore.GREEN + "✅ No tasks! You’re all done.")
+        print("✅ No tasks! You’re all caught up.")
         return
-
-    print(Fore.CYAN + "\nYour To-Do List:")
     for i, task in enumerate(tasks):
-        status = Fore.GREEN + "✅" if task["done"] else Fore.RED + "❌"
-        priority_color = {
-            "Low": Fore.BLUE,
-            "Medium": Fore.YELLOW,
-            "High": Fore.RED
-        }.get(task["priority"], Fore.WHITE)
-
-        due = task["due_date"] if task["due_date"] else "N/A"
-        print(f"{i+1}. {Style.BRIGHT}{task['title']} [{status}]")
-        print(f"   📅 Due: {due} | 🔥 Priority: {priority_color + task['priority']}{Style.RESET_ALL}")
+        print(f"{i + 1}. {task}")
 
 # Add a task
 def add_task(tasks):
     title = input("Enter task title: ")
-    due_date = input("Enter due date (YYYY-MM-DD) or leave blank: ")
-    priority = input("Enter priority (Low, Medium, High): ").capitalize()
-
-    if due_date:
-        try:
-            datetime.strptime(due_date, "%Y-%m-%d")
-        except ValueError:
-            print(Fore.RED + "⚠️ Invalid date format. Setting as N/A.")
-            due_date = "N/A"
-
-    if priority not in ["Low", "Medium", "High"]:
-        print(Fore.RED + "⚠️ Invalid priority. Setting as 'Low'.")
-        priority = "Low"
-
-    tasks.append({
-        "title": title,
-        "done": False,
-        "due_date": due_date,
-        "priority": priority
-    })
+    tasks.append("[ ] " + title)
     save_tasks(tasks)
-    print(Fore.GREEN + "✅ Task added successfully.")
+    print("✅ Task added.")
 
-# Mark a task as done
+# Mark task as done
 def mark_done(tasks):
     show_tasks(tasks)
-    try:
-        index = int(input("Enter task number to mark as done: ")) - 1
-        if 0 <= index < len(tasks):
-            tasks[index]["done"] = True
+    index = int(input("Enter task number to mark as done: ")) - 1
+    if 0 <= index < len(tasks):
+        if not tasks[index].startswith("[X]"):
+            tasks[index] = "[X]" + tasks[index][3:]
             save_tasks(tasks)
-            print(Fore.GREEN + "✅ Task marked as done.")
+            print("✅ Task marked as done.")
         else:
-            print(Fore.RED + "⚠️ Invalid task number.")
-    except ValueError:
-        print(Fore.RED + "⚠️ Please enter a number.")
+            print("⚠️ Task is already marked as done.")
+    else:
+        print("⚠️ Invalid task number.")
 
 # Delete a task
 def delete_task(tasks):
     show_tasks(tasks)
-    try:
-        index = int(input("Enter task number to delete: ")) - 1
-        if 0 <= index < len(tasks):
-            removed = tasks.pop(index)
-            save_tasks(tasks)
-            print(Fore.YELLOW + f"🗑️ Task '{removed['title']}' deleted.")
-        else:
-            print(Fore.RED + "⚠️ Invalid task number.")
-    except ValueError:
-        print(Fore.RED + "⚠️ Please enter a number.")
-
-# Sort tasks
-def sort_tasks(tasks):
-    print("\nSort by:")
-    print("1. Priority")
-    print("2. Due Date")
-    choice = input("Enter your choice (1/2): ")
-    if choice == "1":
-        tasks.sort(key=lambda x: ["Low", "Medium", "High"].index(x["priority"]))
-    elif choice == "2":
-        tasks.sort(key=lambda x: x["due_date"] if x["due_date"] != "N/A" else "9999-12-31")
+    index = int(input("Enter task number to delete: ")) - 1
+    if 0 <= index < len(tasks):
+        tasks.pop(index)
+        save_tasks(tasks)
+        print("🗑️ Task deleted.")
     else:
-        print(Fore.RED + "⚠️ Invalid choice.")
-    save_tasks(tasks)
-    print(Fore.GREEN + "✅ Tasks sorted.")
+        print("⚠️ Invalid task number.")
 
 # Main loop
 def main():
     tasks = load_tasks()
     while True:
-        print("\n📋 " + Fore.CYAN + "To-Do List Menu:")
+        print("\n📋 To-Do List Menu:")
         print("1. Show tasks")
         print("2. Add task")
         print("3. Mark task as done")
         print("4. Delete task")
-        print("5. Sort tasks")
-        print("6. Exit")
+        print("5. Exit")
 
-        choice = input(Fore.MAGENTA + "Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-5): ")
 
         if choice == "1":
             show_tasks(tasks)
@@ -137,12 +77,10 @@ def main():
         elif choice == "4":
             delete_task(tasks)
         elif choice == "5":
-            sort_tasks(tasks)
-        elif choice == "6":
-            print(Fore.GREEN + "👋 Goodbye!")
+            print("👋 Goodbye!")
             break
         else:
-            print(Fore.RED + "⚠️ Invalid choice.")
+            print("⚠️ Invalid choice, please try again.")
 
 if __name__ == "__main__":
     main()
